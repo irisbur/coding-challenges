@@ -51,9 +51,28 @@ def merge_with_copy(nums1, m, nums2, n):
         nums1[i+j:] = copy_in1[j:]
 
 
+# A solution that does not use extra memory is copying the biggest value to the correct index from the end
+# into nums1, that way we can utilize the empty space and take advantage of that space to get a solution in
+# O(n+m) time complexity as we wanted and use O(1) memory as intended in the question.
+def merge_constant_space(nums1, m, nums2, n):
+    if n == 0:
+        return
+    if m == 0:
+        nums1[:] = nums2
+    while m > 0 and n > 0:
+        if nums1[m - 1] > nums2[n - 1]:
+            nums1[m + n - 1] = nums1[m - 1]
+            m -= 1
+        else:
+            nums1[m + n - 1] = nums2[n - 1]
+            n -= 1
+    if n > 0:
+        nums1[:n] = nums2[:n]
+
+
 if __name__ == '__main__':
-    in1 = [1,2,3]
-    in2 = [1]
-    merge_with_copy(nums1=in1, m=3, nums2=in2, n=1)
+    in1 = [1,2,3,0,0,0]
+    in2 = [2,5,6]
+    merge_constant_space(nums1=in1, m=3, nums2=in2, n=3)
     print(in1)
 
