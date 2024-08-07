@@ -55,3 +55,25 @@ class LinkedList:
 
             curr = curr.next
         return False
+
+
+def iterative_reverse(head):
+    prev, curr = None, head
+
+    while curr:
+        new_curr = curr.next
+        curr.next = prev
+        prev = curr
+        curr = new_curr
+    return prev
+
+
+def recursive_reverse(head):
+    if not head or not head.next:
+        return head
+
+    new_head = recursive_reverse(head.next)
+    head.next.next = head
+    head.next = None
+    return new_head
+
