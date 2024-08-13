@@ -41,4 +41,18 @@ class BinNode:
         self.invert_tree_recursive(root.right)
         return root
 
+    def is_balanced(self, root) -> bool:
+        if not root:
+            return True
+        return self.calculate_height(root) != -1
+
+    def calculate_height(self, node):
+        if not node:
+            return 0
+        right_h = self.calculate_height(node.right)
+        left_h = self.calculate_height(node.left)
+        if abs(right_h - left_h) <= 1 and right_h != -1 and left_h != -1:
+            return 1 + max(right_h, left_h)
+        return -1
+
 
