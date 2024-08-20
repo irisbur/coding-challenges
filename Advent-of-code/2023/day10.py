@@ -7,6 +7,8 @@
 # . is ground; there is no pipe in this tile.
 # S is the starting position of the animal; there is a pipe on this
 # North -1, South 1, West -1 , East 1
+
+# Part 1 - Basically implement BFS #
 from collections import deque
 
 NEXT_STEP = {
@@ -22,7 +24,7 @@ def bfs_farthest_point(grid, start):
     queue = deque([start])
     visited = {start: 0}
     max_dist = 0
-
+    edges = []
     while queue:
         i, j = queue.popleft()
 
@@ -33,16 +35,17 @@ def bfs_farthest_point(grid, start):
                 if back_dir in NEXT_STEP[grid[ni][nj]]:
                     visited[(ni, nj)] = visited[(i, j)] + 1
                     queue.append((ni, nj))
+                    edges.append(((i, j), (ni, nj)))
                     max_dist = max(max_dist, visited[(i, j)] + 1)
 
-    return max_dist
+    return list(visited.keys()), edges, max_dist
 
 
 def find_farthermost_point():
     with open("input.txt", "r") as input_file:
         grid = [list(line.strip()) for line in input_file.readlines()]
         start = find_start(grid)
-        return bfs_farthest_point(grid, start)
+        return bfs_farthest_point(grid, start)[1]
 
 
 def find_start(grid):
@@ -52,6 +55,31 @@ def find_start(grid):
                 return i, j
     return -1, -1
 
+# Part 2 - Basically implement Ray Casting #
+
+
+def is_inside(edges, xp, yp):
+    cnt = 0
+    for edge in edges:
+        (x1, y1), (x2, y2) = edge
+        if (yp < y1) != (yp < y2) and xp < x1 + ((yp-y1)/(y2-y1))*(x2-x1):
+            cnt += 1
+    return cnt % 2 == 1
+
+
+def count_enclosed_tiles():
+    with open("input.txt", "r") as input_file:
+        grid = [list(line.strip()) for line in input_file.readlines()]
+        start = find_start(grid)
+        vertices = bfs_farthest_point(grid, start)[0]
+        edges = bfs_farthest_point(grid, start)[1]
+        count_tiles = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if (i, j) not in vertices and is_inside(edges, i, j):
+                    count_tiles += 1
+        return count_tiles
+
 
 if __name__ == "__main__":
-    print(find_farthermost_point())
+    print(count_enclosed_tiles())
