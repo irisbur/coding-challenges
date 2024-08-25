@@ -1,7 +1,6 @@
 from typing import List
 
 
-# correct solution but O(n^2)
 def three_sum(nums: List[int]) -> List[List[int]]:
     nums_map = nums_to_map(nums)
 
@@ -14,6 +13,7 @@ def three_sum(nums: List[int]) -> List[List[int]]:
             diff = -1 * (num1 + num2)
             if num1 == num2 and num2 == diff and len(nums_map[num1]) > 2:
                 triplets.add(tuple(sorted((num1, num2, diff))))
+
             elif diff in nums_map:
                 if (diff != num1 and diff != num2) or (diff == num1 and diff != num2 and len(nums_map[num1]) > 1) or (diff == num2 and diff != num1 and len(nums_map[num2]) > 1):
                     triplets.add(tuple(sorted((num1, num2, diff))))
