@@ -1,17 +1,21 @@
-
 # write a naive solution and then improve it
 from collections import deque
+
 
 def find_sum_galaxies_length():
     with open("input.txt", "r") as input_file:
         grid = [list(line.strip()) for line in input_file.readlines()]
-        # grid, galaxies, expended_rows, expended_cols = find_galaxies(grid)
         sum_length = 0
         expended_grid = expend_grid(grid)
         updated_grid, galaxies = find_galaxies(expended_grid)
 
         for i, galaxy in enumerate(galaxies):
-            dist_mat = find_dists_in_grid(grid, galaxy)
+            dist_mat = find_dists_in_grid(grid, galaxies[i])
+            for j in range(i + 1, len(galaxies)):
+                k, l = galaxies[j]
+                sum_length += dist_mat[k][l]
+        return sum_length
+        # print_mat(dist_mat)
         #     print(dist_mat)
 
 
@@ -24,20 +28,19 @@ def find_dists_in_grid(grid, start):
     queue = deque([start])
 
     while queue:
-        i, j = deque.popleft()
+        i, j = queue.popleft()
 
         for di, dj in directions:
             ni, nj = i + di, j + dj
-            if is_valid_index(n, m, ni, nj) and dist_mat == -1:
-                dist_mat[ni][nj] = 1 + grid[i][j]
-            elif is_valid_index(n, m, ni, nj) and dist_mat != -1:
-                dist_mat[ni][nj] = min(1 + grid[i][j], dist_mat[ni][nj])
-    for line in dist_mat:
-        print(''.join(line))
+            if is_valid_index(n, m, ni, nj) and dist_mat[ni][nj] == -1:  # not visited
+                dist_mat[ni][nj] = 1 + dist_mat[i][j]
+                queue.append((ni, nj))
     return dist_mat
 
 
-
+def print_mat(mat):
+    for line in mat:
+        print(''.join(str(line)))
 
 
 def is_valid_index(n, m, i, j):
@@ -75,7 +78,6 @@ def find_galaxies(grid):
                 grid[i][j] = galaxies_count
                 galaxies.append((i, j))
     return grid, galaxies
-
 
 
 print(find_sum_galaxies_length())
