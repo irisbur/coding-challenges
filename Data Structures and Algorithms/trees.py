@@ -2,6 +2,9 @@
 # General tree, can have maby children.
 
 from collections import deque
+from typing import Optional
+
+
 class Node:
     def __init__(self, val=0, children=None):
         if children is None:
@@ -54,5 +57,19 @@ class BinNode:
         if abs(right_h - left_h) <= 1 and right_h != -1 and left_h != -1:
             return 1 + max(right_h, left_h)
         return -1
+
+
+def diameter_of_binary_tree(root: Optional[BinNode]) -> int:
+    # return for each node the height and the max diameter (h, d).
+    def dfs(node):
+        if not node:
+            return -1, 0
+
+        hl, dl = dfs(node.left)
+        hr, dr = dfs(node.right)
+        h = 1 + max(hl, hr)
+        d = max(max(dl, 2 + hr + hl), dr)
+        return h, d
+    return dfs(root)[1]
 
 
