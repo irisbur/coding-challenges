@@ -1,28 +1,22 @@
-from collections import deque
+from collections import deque, Counter
 
 
 # Question 1 - warm up
-# Given and array of integers write a function that find two distint numbers that thiers sum is zero
-# and return their indices, if there are a few options you can return one.
-# if there's no such pair, return null.
-# Write an algorithm that runs in O(n) time complexity
+# Given an array of integers, find two distinct numbers whose sum is zero and return their indices.
+# If there are multiple valid pairs, return any one. If no such pair exists, return None.
+# The algorithm should run in O(n) time complexity.
 def two_sum(nums):
-    int_to_dict = {}
-    for n in nums:
-        int_to_dict[n] = int_to_dict.get(n, 0) + 1
-
-    for i in nums:
-        neg = -1 * nums[i]
-        if neg != 0 and neg in nums:
-            return [i, int_to_dict[neg]]
-
+    num_to_index = {}
+    for i, num in enumerate(nums):
+        complement = -num
+        if complement in num_to_index:
+            return [num_to_index[complement], i]
+        num_to_index[num] = i
     return None
 
 
 # Question 2 - Look and Say
-# number, n
-# 2, 3 : 3112
-# 211, 1 -> 1221
+# Given a starting number and an integer n, generate the n-th term in the “look-and-say” sequence.
 def look_and_say(number, n):
     current_seq = str(number)
 
@@ -44,12 +38,11 @@ def look_and_say(number, n):
     return current_seq
 
 
-# Island map - count steps from S to D on a n*m grid, if you cant reach the grid return -1.
-# at each step you can move up, down, keft or right only on empty cells.
-# '.' - empty cell
-# '*' - flooded cell
-# 'X' - rock
-# at every move the flooded cell flood all their empty neighbors.
+# Island map
+# Given an n*m grid with different types of cells
+# (.: empty, *: flooded, X: rock, S: start, D: destination),
+# find the shortest path from S to D while handling flooding cells that expand at every step.
+# Return the number of steps or -1 if unreachable.
 def count_steps(island_map):
     n, m = len(island_map), len(island_map[0])
     directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
@@ -57,16 +50,22 @@ def count_steps(island_map):
     qe = deque([(si, sj, 0)])
     visited = {(si, sj)}
     flooded = find_initial_flood(island_map)
+    last_flooded_step = -1
     while qe:
         ci, cj, step = qe.popleft()
-        flooded = flood(island_map, flooded)
+
+        if step != last_flooded_step:
+            flooded = flood(island_map, flooded)
+            last_flooded_step = step
+
         for di, dj in directions:
             ni, nj = ci + di, cj + dj
             if is_position_valid(ni, nj, n, m) and island_map[ni][nj] == "D":
                 return step + 1
-            elif is_position_valid(ni, nj, n, m) and island_map[ni][nj] == ".":
+            elif is_position_valid(ni, nj, n, m) and island_map[ni][nj] == "." and (ni, nj) not in visited:
                 visited.add((ni, nj))
                 qe.append((ni, nj, step + 1))
+
     return -1
 
 
@@ -106,18 +105,11 @@ def find_initial_position(grid):
 
 # Question 4: poker hands
 # Part 1
-# write a function that recives a hand and returns the type of the hand,
-# the function recives string with len 5 representing 5 cards from 2-9, J, Q, K
-# ignore 10 and assume all input is valid.
-# the types are: "Four of a Kind", "Full House", "Three of a kind", "Two Pair", "Pair"
-# and if you don't match any of these return "High Card".
+# Given a string representing a poker hand (5 cards), determine the type of the hand.
+# Types include “Four of a Kind”, “Full House”, “Three of a Kind”, “Two Pair”, “Pair”, and “High Card”.
 def get_hand_type(hand):
-    cntr = {}
-    for c in hand:
-        cntr[c] = cntr.get(c, 0) + 1
-
-    counts = [v for k, v in cntr.items()]
-    counts.sort()
+    cntr = Counter(hand)
+    counts = sorted(cntr.values())
 
     if counts == [1, 4]:
         return "Four of a Kind"
@@ -133,12 +125,18 @@ def get_hand_type(hand):
 
 
 # Part 2
-# write a function that recives handA and handB and returns 1 if handA is stronger, -1 if B is stronger
-# 0 if there's a tie.
-# base the srtengths accoding to the card type, if they're the same type compare them alphabetically in dsc order.
+# Write a function that receives two poker hands (handA and handB) and compares their strength to
+# determine which is stronger. The function should return:
+# 	1 if handA is stronger than handB.
+# 	-1 if handB is stronger than handA.
+# 	0 if both hands have the same strength.
 def stronger_card(handA, handB):
     type_to_strength = {"Four of a Kind": 5, "Full House": 4,
                         "Three of a Kind": 3, "Two Pair": 2, "Pair": 1, "High Card": 0}
+
+    card_order = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8,
+                  '9': 9, 'J': 11, 'Q': 12, 'K': 13}
+
     type_a = get_hand_type(handA)
     type_b = get_hand_type(handB)
 
@@ -147,11 +145,13 @@ def stronger_card(handA, handB):
     elif type_to_strength[type_a] < type_to_strength[type_b]:
         return -1
     else:
-        handA.sort(reverse=True)
-        handB.sort(reverse=True)
-        for i in range(len(handA)):
-            if handA[i] > handB[i]:
+        sorted_a = sorted(handA, key=lambda x: card_order[x], reverse=True)
+        sorted_b = sorted(handB, key=lambda x: card_order[x], reverse=True)
+
+        for i in range(len(sorted_a)):
+            if card_order[sorted_a[i]] > card_order[sorted_b[i]]:
                 return 1
-            elif handA[i] < handB[i]:
+            elif card_order[sorted_a[i]] < card_order[sorted_b[i]]:
                 return -1
+
     return 0
