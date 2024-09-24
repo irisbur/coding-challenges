@@ -170,14 +170,76 @@ def helper(root):
 
 
 # Q12
+# solve recursively..
+def is_pal(s):
+    if len(s) < 2:
+        return True
+    if s[0] != s[-1]:
+        return False
+    return is_pal(s[1:-1])
+
+
+def recursive_find(s, k, pals, seen, i, j):
+    if i >= j or len(s[i:j]) < k or (i, j) in seen:
+        return
+    if is_pal(s[i:j]):
+        pals.append(s[i:j])
+        seen.add((i, j))
+    recursive_find(s, k, pals, seen, i + 1, j)
+    recursive_find(s, k, pals, seen, i, j - 1)
+
+
 def find_palindromes(string, k):
-    if k > len(string):
-        return []
+    pals = []
+    recursive_find(string, k, pals, set(), 0, len(string))
+    return pals
 
-    pass
+
+def check_q12():
+    assert sorted(find_palindromes("aba", 1)) == ['a', 'a', 'aba', 'b']
+    assert find_palindromes("aba", 2) == ['aba']
+    assert find_palindromes("apple", 2) == ['pp']
+    assert find_palindromes("apple", 3) == []
+
+check_q12()
+
+#Q13
+
+def set_permissions(password, num_access):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            if args[0] != password or wrapper.calls >= num_access:
+                raise PermissionError
+            wrapper.calls += 1
+            print(func.__name__ + str(wrapper.calls))
+            result = func(*args[1:], **kwargs)
+            return result
+
+        wrapper.calls = 0
+        return wrapper
+    return decorator
 
 
-# Q13
+def check_q13():
+    @set_permissions("hello", 2)
+    def add(x, y):
+        return x + y
+
+    print(add("hello", 1, 2))  # 3
+    print(add("hello", "a", "b"))  # 'ab'
+    print(add("hello", 5, 6))  # Traceback...PermissionError Too many accesses
+
+    @set_permissions("yes", 2)
+    def double(x):
+        return 2 * x
+
+    print(double("yes", "bye")) # 'byebye'
+    print(double("no", 10)) #  Traceback...PermissionError  Wrong password
+
+# check_q13()
+
+
+# Q14
 class Plane:
     def __init__(self, rows, cols, baggage_allowance):
         self.rows = rows
@@ -237,7 +299,7 @@ class Plane:
         return 0 <= i < self.rows and 0 <= j <= self.cols
 
 
-def check_q13():
+def check_q14():
     plane = Plane(10, 4, 25)
     # Register the passenger "1" to locations (2, 2) and (2, 3)
     assert plane.register(1, (2, 3)) == True
@@ -265,6 +327,71 @@ def check_q13():
     assert plane.add_suitcase(200, 10, 1) == True
     # Suitcase was removed when "2" deregistered
 
-# Q14
+
 # Q15
+# read about generators in python..
+def chunked(iterable, size):
+    iterable = iter(iterable)
+
+    while True:
+        chunk = []
+
+        try:
+            for _ in range(size):
+                chunk.append(next(iterable))
+        except StopIteration:
+            if chunk:
+                yield chunk
+            break
+        yield chunk
+
+
+def check_q15():
+    data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    print(list(chunked(data, 3)))
+    # Expected output: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+    print(list(chunked(data, 4)))
+    # Expected output: [[1, 2, 3, 4], [5, 6, 7, 8], [9]]
+
+    print(list(chunked(data, 1)))
+    # Expected output: [[1], [2], [3], [4], [5], [6], [7], [8], [9]]
+
+    print(list(chunked(data, 20)))
+    # Expected output: [[1, 2, 3, 4, 5, 6, 7, 8, 9]]
+
+    data = range(1, 10)
+    print(list(chunked(data, 3)))
+    # Expected output: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+    data = 'abcdefghi'
+    print(list(chunked(data, 3)))
+    # Expected output: [['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']]
+
+# check_q15()
+
+
 # Q16
+def longest_unique_substring(s):
+    longest_l = 0
+    curr_s = ''
+
+    for i, c in enumerate(s):
+        if c not in curr_s:
+            curr_s += c
+        else:
+            c_ind = curr_s.index(c)
+            curr_s = curr_s[c_ind+1:] + c
+        if len(curr_s) > longest_l:
+            longest_l = len(curr_s)
+    return longest_l
+
+def check_q16():
+    assert longest_unique_substring('aaaaaaaaaaaaaaa') == 1 # the string: 'a'
+    assert longest_unique_substring('aabbccddeeffgghhiijjkkll') == 2 # the string: 'ab' or 'bc' or others
+    assert longest_unique_substring('abcabcbb') == 3 # the string: 'abc' or others
+    assert longest_unique_substring('abrkaabcdefghijjxxx') == 10 # the string: 'abcdefghij'
+    assert longest_unique_substring('abcdefgh') == 8 # the string: 'abcdefgh'
+
+# check_q16()
+
