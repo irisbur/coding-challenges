@@ -1,3 +1,16 @@
+
+'''
+Q1:
+Count slowly the amount of operations and notice its
+2^1 + 2^2 + .... 2^n  = 2 ^{n+1} operations. so the time complexity is O(n^2)
+'''
+
+
+'''
+Q2:
+sorting is O(nlog(n)) were sorting n times so the runtime is O(n^2log(n))
+'''
+
 def q3():
     concat_strings = lambda a: ''.join(a)
 
@@ -33,6 +46,10 @@ def check_q4():
     assert alternate(4233) is False  # (4 > 2 < 3 = 3)
 
 
+'''
+Q5:
+(1) 7 (2) 5
+'''
 def q5():
     a = [[i] * i for i in range(2)]
     b = a
