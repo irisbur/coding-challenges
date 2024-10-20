@@ -1,12 +1,13 @@
+def on(x):
+    return x + 1
 
-def true(x):
-    return True
 
-def false(x):
-    return False
+def off(x):
+    return max(x - 1, 0)
+
 
 def toggle(x):
-    return not x
+    return x + 2
 
 
 def read_instructions():
@@ -23,14 +24,14 @@ def read_instructions():
             else:
                 s_c, s_r = [int(n) for n in line_list[2].split(',')]
                 e_c, e_r = [int(n) for n in line_list[4].split(',')]
-                parsed_instructions.append((line_list[1],(s_r, e_r), (s_c, e_c)))
+                parsed_instructions.append((line_list[1], (s_r, e_r), (s_c, e_c)))
         return parsed_instructions
 
 
 def count_lights_on(instructions):
-    map_ = {'on': true, 'off': false, 'toggle': toggle}
+    map_ = {'on': on, 'off': off, 'toggle': toggle}
     lights = 0
-    grid = [[False for _ in range(1000)] for _ in range(1000)]
+    grid = [[0 for _ in range(1000)] for _ in range(1000)]
     for instruction, rows, cols in instructions:
         for r in range(rows[0], rows[1] + 1):
             for c in range(cols[0], cols[1] + 1):
@@ -38,8 +39,7 @@ def count_lights_on(instructions):
 
     for i in range(len(grid)):
         for j in range(len(grid[0])):
-            if grid[i][j]:
-                lights += 1
+            lights += grid[i][j]
 
     return lights
 
