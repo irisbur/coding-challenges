@@ -26,13 +26,13 @@ def main():
                 places.append(line[2])
             adjacency_list[tuple(sorted((line[0], line[2])))] = int(line[4])
         all_perms = all_paths_perms(places)
-        lowest_cost = math.inf
+        longest_cost = 0
         for path in all_perms:
             cur_cost = 0
             for i in range(len(places) - 1):
                 cur_cost += adjacency_list[tuple(sorted((path[i], path[i+1])))]
-            lowest_cost = min(lowest_cost, cur_cost)
-        return lowest_cost
+            longest_cost = max(longest_cost, cur_cost)
+        return longest_cost
 
 
 print(main())
