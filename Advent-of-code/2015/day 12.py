@@ -21,50 +21,22 @@ def find_all_numbers(text):
     return num_sum
 
 
-def count_in_list(json_list):
-    count = 0
-    for v in json_list:
-        if isinstance(v, dict):
-            count += count_in_dict(v)
-        elif isinstance(v, list):
-            count += count_in_list(v)
-        elif isinstance(v, int):
-            count += v
-        elif v.isdigit():
-            count += int(v)
-    return count
-
-
-def count_in_dict(json_dict):
-    count = 0
-    for k, v in json_dict.items():
-        if k == 'red' or v == 'red':
-            return 0
-        elif isinstance(v, dict):
-            count += count_in_dict(v)
-        elif isinstance(v, list):
-            count += count_in_list(v)
-        elif isinstance(v, int):
-            count += v
-        elif v.isdigit():
-            count += int(v)
-    return count
-
-
-def count_in_json(input_json):
-    count = 0
-    if isinstance(input_json, dict):
-        count += count_in_dict(input_json)
-    elif isinstance(input_json, list):
-        count += count_in_list(input_json)
-    return count
+def count_in_json(data):
+    if isinstance(data, int):
+        return data
+    elif isinstance(data, str) and data.isdigit():
+        return int(data)
+    elif isinstance(data, dict) and ('red' not in data.values()) and ('red' not in data.keys()):
+        return sum(count_in_json(value) for value in data.values())
+    elif isinstance(data, list):
+        return sum([count_in_json(value) for value in data])
+    return 0
 
 
 def main():
     with (open('input.txt') as f):
-        json_string = f.readlines()[0]
+        json_string = f.read().strip()
         js = json.loads(json_string)
-
         print(count_in_json(js))
 
 
