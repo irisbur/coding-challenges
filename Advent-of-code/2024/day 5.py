@@ -75,7 +75,6 @@ def count_wrong_middle_pages():
     for update in updates:
         if not is_update_correct(rules, update):
             sorted_update = fix_update(update, edges)
-            print(sorted_update)
             middles_sum += sorted_update[len(sorted_update) // 2]
     return middles_sum
 
