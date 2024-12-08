@@ -13,34 +13,44 @@ def parse_input():
 
 def generate_op_combinations(n):
     if n == 1:
-        return ['0', '1']
+        return ['0', '1', '2']
     ops = generate_op_combinations(n-1)
     new = []
     for comb in ops:
         new.append("0" + comb)
         new.append("1" + comb)
+        new.append("2" + comb)
     return new
 
+def concat(a,b):
+    return int(str(a) + str(b))
 
-def calibration_result(equation):
-    result, numbers = equation
-    combinations = generate_op_combinations(len(numbers) - 1)
-    for combination in combinations:
-        total = numbers[0]
-        for i, c in enumerate(combination):
-            if c == '0':
-                total += numbers[i+1]
-            else:
-                total *= numbers[i+1]
-        if total == result:
-            return result
-    return 0
+def is_calibrated_(result, numbers, combination):
+    return calibration_result(numbers, combination) == result
+
+def calibration_result(numbers, combination):
+    total = numbers[0]
+    for i, c in enumerate(combination):
+        if c == '0':
+            total += numbers[i+1]
+        elif c == '1':
+            total *= numbers[i+1]
+        elif c == '2':
+            total = concat(total, numbers[i+1])
+    return total
 
 
 def total_calibration_result(equations):
     total = 0
     for equation in equations:
-        total += calibration_result(equation)
+        result, numbers = equation
+        combinations = generate_op_combinations(len(numbers) - 1)
+        for combination in combinations:
+            is_calibrated = is_calibrated_(result, numbers, combination)
+            if is_calibrated != 0:
+                # print(equation, combination)
+                total += result
+                break
     return total
 
 
