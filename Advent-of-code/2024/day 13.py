@@ -37,12 +37,12 @@ def parse_block(block):
                 _, value = part.split("=")
                 vector.append(float(value.strip()))
 
-    return np.array(matrix).T, np.array(vector)
+    return np.array(matrix).T, np.array(vector) + 10000000000000
 
 def solve_presses(buttons_matrix, prize):
     try:
         presses = solve(buttons_matrix, prize)
-        if not np.isclose(presses, np.round(presses)).all() or (presses[0] > 100 or presses[1] > 100):
+        if not np.isclose(presses - np.round(presses),np.array([0,0]), atol=1e-4).all():
             return 0
 
         cost = 3 * presses[0] + presses[1]
