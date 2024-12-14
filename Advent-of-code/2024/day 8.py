@@ -25,15 +25,22 @@ def count_antinodes():
     for antenna in antennas:
         for i, pos1 in enumerate(antennas[antenna]):
             for j, pos2 in enumerate(antennas[antenna][i + 1:]):
+                antinodes.add((pos1[0], pos1[1]))
+                antinodes.add((pos2[0], pos2[1]))
                 di, dj = abs(pos1[0] - pos2[0]), abs(pos1[1] - pos2[1])
                 a1i = pos1[0] + di if pos1[0] > pos2[0] else pos1[0] - di
                 a1j = pos1[1] + dj if pos1[1] > pos2[1] else pos1[1] - dj
-                if is_valid_coord(a1i, a1j, n, m):
+                while is_valid_coord(a1i, a1j, n, m):
                     antinodes.add((a1i, a1j))
+                    a1i = a1i + di if pos1[0] > pos2[0] else a1i - di
+                    a1j = a1j + dj if pos1[1] > pos2[1] else a1j - dj
+
                 a2i = pos2[0] + di if pos1[0] < pos2[0] else pos2[0] - di
                 a2j = pos2[1] + dj if pos1[1] < pos2[1] else pos2[1] - dj
-                if is_valid_coord(a2i, a2j, n, m):
+                while is_valid_coord(a2i, a2j, n, m):
                     antinodes.add((a2i, a2j))
+                    a2i = a2i + di if pos1[0] < pos2[0] else a2i - di
+                    a2j = a2j + dj if pos1[1] < pos2[1] else a2j - dj
 
     return len(antinodes)
 
